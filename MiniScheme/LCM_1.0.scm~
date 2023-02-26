@@ -1,0 +1,121 @@
+;(define lcm
+ ; (lambda ()
+;(let ((n (read))
+ ;     (lcm (read))
+  ;    (begin
+   ;     (let ((next (read))
+    ;          (set! a lcm)
+     ;         (set! b next)
+      ;        (if (not (eqv? b 0))
+       ;           (let ((temp b)
+        ;                (b (modulo a b))
+         ;               (a temp))
+          ;          (let ((gcd a)
+           ;               (set! lcm (* lcm (/ next gcd)))
+            ;              (begin
+             ;               (write lcm)
+              ;              (newline)
+               ;             (lcm)))))))))))))
+;(define (lcm2)
+ ; (let ((n (read))
+  ;      (lcm (read)))
+   ; (let ((next (read))
+    ;      (a lcm)
+     ;     (b next))
+      ;(if (not (eqv? b 0))
+       ;   (let ((temp b)
+        ;        (b (modulo a b))
+         ;       (a temp))
+          ;  (let ((gcd a))
+           ;   (set! lcm (* lcm (/ next gcd)))
+            ;  (begin
+             ;   (write lcm)
+              ;  (newline)
+               ; (lcm2))))))))
+
+;(define (lcm2)
+ ; (let ((n (read))
+  ;      (lcm (read)))
+   ; (let loop ((i 1) (lcm lcm))
+    ;  (if (< i n)
+     ;     (let ((next (read))
+      ;          (a lcm)
+        ;        (b next))
+       ;     (let loop2 ((b b))
+         ;     (if (not (eqv? b 0))
+          ;        (let ((tmp b))
+           ;         (set! b (modulo a b))
+            ;        (set! a tmp)
+             ;       (loop2 b))
+              ;  (let ((gcd a))
+               ;   (set! lcm (* lcm (/ next gcd)))
+                ;  (loop (+ i 1) lcm)))))
+         ; (begin
+          ;  (write lcm2)
+           ; (newline))))))
+
+;(define A
+ ; (lambda (m n)
+  ;  (if (eqv? m 0)
+   ;     (+ n 1)
+   ;(if (eqv? n 0)
+    ;   (A (- m 1) 1)
+     ;  (A (- m 1) (A m (- n 1)))))))
+
+;(define process
+ ; (lambda ()
+  ;  (let ((m (read))
+   ;     (n (read)))
+    ;(if (eqv? m -1)
+     ;   #t
+    ;(begin
+     ; (write (A m n))
+      ;(newline)
+      ;(process))))))
+;(define (process)
+ ; (let ((n (read)))
+  ;  (let ((lcm (read)))
+   ;   (let ((temp 0)
+    ;        (b 0)
+     ;       (a 0))
+      ;  (begin
+       ;   (let ((next (read)))
+        ;    (set! temp b)
+         ;   (set! b (modulo a b))
+          ;  (set! a temp))
+          ;(define gcd a)
+          ;(set! lcm (* lcm (quiotient next gcd)))
+          ;(write lcm)
+          ;(newline)
+          ;(process))))))
+
+(define (process)
+  (let ((n (read))
+        (lcm (read))
+        (temp 0)
+        (a 0)
+        (b 0)))
+    (begin
+      (let ((next (read)))
+        (begin ; added begin form here
+          (set! next (read))
+          (set! a lcm)
+          (set! b next)
+          (begin
+            (set! temp b)
+            (set! b (modulo a b))
+            (set! a temp)
+            (define gcd a)
+            (set! lcm (* lcm (quotient next gcd)))
+            (write lcm)
+            (newline)
+            (process)))))))
+
+
+
+
+(process)
+
+
+                  
+                        

@@ -1,0 +1,243 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = true;
+//  DEBUG_PARSER = true;
+}
+
+PARSER_BEGIN(MiniScheme4)
+import java.util.Scanner;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+public class MiniScheme4
+{
+  public static void main(String args[]) throws ParseException
+  {
+    try {
+      MiniScheme4 parser = null;
+      if (args.length > 0)
+      parser = new MiniScheme4(new FileInputStream(args[0]));
+      else
+      {
+             System.out.print("Program filename: ");
+             Scanner in = new Scanner(System.in);
+             parser = new MiniScheme4(new FileInputStream(in.next()));
+       } 
+      Program p = MiniScheme4.program();
+      p.eval(new Env());
+    }
+    catch (FileNotFoundException e)
+    {
+           System.out.println(e.getMessage());
+    }   
+    catch (RuntimeException e)
+    {
+           System.out.println(e.getMessage());
+    } 
+  }
+}
+ 
+PARSER_END(MiniScheme4)
+
+SKIP :
+{
+  " "
+| "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN : /* OPERATORS */
+{
+  < PLUS : "+" >
+| < MINUS : "-" >
+| < MULTIPLY : "*" >
+| < DIVIDE : "quotient" >
+}
+
+
+
+TOKEN :
+{
+< INTEGER : ("+" | "-")? (< DIGIT >)+ >
+}
+
+TOKEN:
+{
+< BOOLEAN : ("#t"| "#f") > // for now #t will still return false
+}
+
+TOKEN :
+{
+	< WRITE : "write" >
+| < READ : "read" >
+| < NEWLINE : "newline" >
+| < LPAREN  : "(" >
+| < RPAREN  : ")" >
+| < DEFINE : "define" >
+| < SET : "set!" >
+| < LET : "let" >
+| < IF : "if" >
+| < AND : "and" >
+| < OR : "or" >
+| < NOT : "not" >
+| < EQV : "eqv?" >
+| < LT : "<" >
+| < IsINTEGER : "integer?" >
+| < IsBOOLEAN : "boolean?" >
+| < LAMBDA : "lambda" >
+
+}
+
+TOKEN :
+{
+< IDENTIFIER : (< INITIAL >) (< SUBSEQUENT >)* >
+|  < #INITIAL : ["a"-"z" ,"!", "$", "%", "&" ,"*" ,"/", ":", "<", "=", ">", "?", "^", "_", "~"] >
+|  < #SUBSEQUENT : (< INITIAL >) | (< DIGIT >) | ["+", "-", ".", "@"] >
+|  < #DIGIT : ["0"-"9"] >
+}
+
+
+Program program() :
+{ Program p = new Program(); Def d; Exp e; }
+{
+  (LOOKAHEAD(< LPAREN > <DEFINE >) d = def() {p.expList.add(d); }  | e = exp() { p.expList.add(e); } )* < EOF > { return p; }
+
+}
+
+Def def() :
+{Identifier v; Def d; Exp e;} 
+{
+  < LPAREN >
+  (
+    < DEFINE > v = variable() e = exp() {d = new Define(v, e); } 
+    )
+    < RPAREN >
+    { return d ;}
+}
+
+Identifier variable() :
+{}
+{
+	< IDENTIFIER > { return new Identifier(token.image); }
+}
+
+Exp exp() :
+{Exp e;}
+{
+ e = variable() { return e; }
+| e = literal() { return e; }
+| LOOKAHEAD(< LPAREN > <IF >) e = conditional() { return e; }
+| LOOKAHEAD(< LPAREN > <SET >) e = assignment() { return e; }
+| LOOKAHEAD( <LPAREN > < LAMBDA >) e = lambdaExp() { return e; }
+| LOOKAHEAD( <LPAREN > < IDENTIFIER > ) e = procedureCall() { return e; } 
+| e = derivedExp() { return e; }
+
+  
+}
+
+Exp literal() :
+{}
+{
+	< INTEGER > { return new Int(Integer.parseInt(token.image)); }
+|
+	< BOOLEAN > { return new Bool(token.image); }
+}
+
+Exp conditional() :
+{Exp exp1; Exp exp2; Exp exp3 = null;}
+{
+	< LPAREN >
+	( < IF >  exp1 = exp() exp2 = exp() (exp3 = exp())? {exp1 = new If(exp1, exp2, exp3); } 
+	)
+	< RPAREN >
+	{ return exp1 ;}	  
+}
+
+
+Exp assignment() :
+{Identifier v; Exp e;}
+{
+	< LPAREN >
+	( < SET > v = variable() e = exp() {e = new Set(v, e); }
+)
+< RPAREN >
+{ return e; }
+	  
+}
+
+
+Exp derivedExp() :
+{ Exp exp1 = null, exp2 = null; String op;And and = new And(); Or or = new Or(); Identifier v;}
+{
+
+  < LPAREN >
+	(
+	  < WRITE > exp1 = exp() { exp1 = new  Write(exp1); }
+| < READ > { exp1 = new Read(); }
+| < NEWLINE > { exp1 = new Newline(); }
+| (< PLUS > | < MINUS > | < MULTIPLY > | < DIVIDE >) {op = token.image; } exp1 = exp() exp2 = exp()
+{ exp1 = new ArithExp(op, exp1, exp2); }
+| < LET > {Let l = new Let(); } < LPAREN > (bindingSpec(l))* < RPAREN > body(l)  {exp1 = l; }
+| < AND > (exp1 = exp() { and.e.add(exp1); })*  {exp1 = and;} 
+| < OR > (exp1 = exp() { or.ors.add(exp1); })* { exp1 = or; } 
+| < NOT > exp1 = exp() { exp1 = new Not(exp1); } 
+| < EQV > exp1 = exp() exp2 = exp() { exp1 = new Eqv(exp1, exp2); } 
+| < LT > exp1 = exp() exp2 = exp() { exp1 = new LessThan(exp1, exp2); } 
+| < IsINTEGER > exp1 = exp() { exp1 = new isInteger(exp1); } 
+| < IsBOOLEAN > exp1 = exp() { exp1 = new isBoolean(exp1); } 
+)
+
+< RPAREN >
+	{return exp1;} 
+}
+
+
+Exp bindingSpec(Let l) :
+{Identifier v; Exp e;}
+{
+	< LPAREN >
+	(v = variable() {l.var.add(v); } e = exp() { l.bindingExp.add(e); } )
+	< RPAREN >
+	{ return l; }
+}
+
+void body(Let l) :
+{Def d; Exp e; }
+{
+  (LOOKAHEAD(< LPAREN > <DEFINE >) d = def() {l.bodyExp.add(d); })* (e = exp() { l.bodyExp.add(e); } )+
+
+ 
+}
+
+void body2(Lambda lam) :
+{Def d; Exp e; }
+{
+  (LOOKAHEAD(< LPAREN > < DEFINE >) d = def() {lam.bodyExp.add(d); })* (e = exp() { lam.bodyExp.add(e); } )+ 
+ 
+}
+
+// (lamnda ( { < variable > }) < body >)
+Exp lambdaExp() :
+{Identifier v; Exp exp1; }
+{
+	< LPAREN >
+	(< LAMBDA > { Lambda lam = new Lambda(); } < LPAREN > (v = variable() { lam.var.add(v); })* < RPAREN > body2(lam)) { exp1 = lam; }
+	< RPAREN >
+	{ return exp1; }
+}
+  
+
+// ( { < expression > }+ )
+Exp procedureCall() :
+{Exp e;}
+{
+  < LPAREN >
+	{ ProcedureCall pc = new ProcedureCall(); } (e = exp() { pc.exps.add(e); })* 
+	< RPAREN >
+	{ return pc; }
+}
+
+
