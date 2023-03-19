@@ -1,0 +1,5 @@
+user1:password1
+nick:yea
+user2:password2
+user0:password0
+clif:pswd?
