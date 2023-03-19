@@ -1,0 +1,11 @@
+Michael Palma
+To run my programs open two terminal windows
+After changing into the directory with the files
+First, run the server with: java RPSLSServer
+Then, in the other terminal run: java RPSLSClient
+You will be prompted with start and make a choice,
+make a choice, once a player reached two points, 
+you will be prompted whether or not you want to play again by 
+inputed (y/n) for yes or no respectively. 
+n will close the socket
+and y will start another game.
