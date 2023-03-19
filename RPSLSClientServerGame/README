@@ -1,5 +1,9 @@
 Michael Palma
-To run my programs open two terminal windows
+  This is a game of inspired by the The Big Bang Theory 
+sitcom of Rock, Paper, Sciessors, Lizard,Spock. Implemented
+with sockets to allow for Server to play with a user (client).
+
+  To run my programs open two terminal windows
 After changing into the directory with the files
 First, run the server with: java RPSLSServer
 Then, in the other terminal run: java RPSLSClient
